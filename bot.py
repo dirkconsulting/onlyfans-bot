@@ -1,58 +1,68 @@
 import time, random
-from onlyfans import login_onlyfans, get_online_users, send_message
+from onlyfans import (
+    login_onlyfans,
+    get_online_users,
+    get_subscribers,
+    send_message,
+    send_welcome_message,
+    send_engagement_message,
+    detect_new_online_users
+)
 from chatgpt_api import generate_ai_response
-from database import get_user_info, update_user_info, get_random_message, check_new_subscribers
+from database import (
+    user_exists, create_user_record, update_user_last_interaction,
+    save_conversation, get_user_info
+)
 from ppv import send_ppv_offer
-from random import choice
-from bot_logic import engage_online_users, handle_new_subscribers
 
-# Iniciar sesión en OnlyFans
+# Inicia sesión en OnlyFans
 driver = login_onlyfans()
+prev_online_users = set()
 
-def handle_new_subscriber(username):
-    """Envía un mensaje de bienvenida único a nuevos suscriptores."""
-    welcome_message = get_random_message("Welcome Messages", username)
-    send_message(driver, username, welcome_message)
+print("🤖 Bot iniciado y listo para trabajar...")
+
+def handle_new_subscribers():
+    """Detecta nuevos suscriptores y les da la bienvenida."""
+    subscribers = get_subscribers(driver)
+    for username in subscribers:
+        if not user_exists(username):
+            create_user_record(username)
+            send_welcome_message(driver, username)
+            print(f"👋 Nuevo suscriptor: {username}")
 
 def engage_online_users():
-    """Identifica usuarios en línea, conversa con ellos y vende PPV de manera personalizada."""
-    online_users = get_online_users(driver)
+    """Engancha a los usuarios online con conversación personalizada y PPV."""
+    global prev_online_users
 
-    for user in online_users:
-        notable_info, last_messages = get_user_info(user)
+    new_users = detect_new_online_users(driver, prev_online_users)
+    print(f"🟢 Nuevos usuarios online: {new_users}")
 
-        # Genera una respuesta de IA basada en el historial del usuario
-        ai_response = generate_ai_response(user, last_messages)
-        send_message(driver, user, ai_response)
+    for username in new_users:
+        notable_info, last_messages = get_user_info(username)
 
-        # Probabilidad de venta PPV (ajustable según la estrategia de ventas)
-        if random.random() > 0.5:  # 50% de probabilidad de vender un PPV
-            send_ppv_offer(driver, user)
+        # Generar respuesta de ChatGPT
+        ai_response = generate_ai_response(username, last_messages)
 
-        # Guardar la nueva interacción en la base de datos
-        update_user_info(user, ai_response)
+        # Enviar respuesta
+        send_message(driver, username, ai_response)
 
-def get_random_message(category):
-    messages = {
-        "Welcome Messages": [
-            "¡Hola! Gracias por suscribirte 😊",
-            "¡Bienvenido! Estoy emocionada de tenerte aquí 😘"
-        ]
-    }
-    return choice(messages.get(category, ["¡Hola!"]))
+        # Guardar en base de datos
+        update_user_last_interaction(username)
+        save_conversation(username, ai_response, tipo="chat")
 
-def send_welcome_message(driver, username):
-    welcome_message = get_random_message("Welcome Messages")
-    send_message(driver, username, welcome_message)
+        # Con 60% de probabilidad se intenta vender un PPV
+        if random.random() > 0.4:
+            send_ppv_offer(driver, username)
 
-def handle_new_subscribers(driver):
-    new_users = check_new_subscribers(driver)
-    for user in new_users:
-        send_welcome_message(driver, user)
+    # Actualizamos la lista de usuarios conectados
+    prev_online_users = set(get_online_users(driver))
 
-# Loop de ejecución continua con intervalos para evitar bloqueos
+# Bucle principal
 while True:
-    handle_new_subscribers(driver)
-    engage_online_users(driver)
-    time.sleep(300)  # Ejecutar cada 5 minutos
-
+    try:
+        handle_new_subscribers()
+        engage_online_users()
+        time.sleep(300)  # Espera 5 minutos
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        time.sleep(60)
