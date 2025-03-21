@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OnlyFans Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { color: #333; }
+        .stats { margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>📊 General Dashboard</h1>
+
+    <div class="stats">
+        <p><strong>Total Users:</strong> {{ user_count }}</p>
+        <p><strong>Total PPV Videos:</strong> {{ video_count }}</p>
+        <p><strong>Total Messages:</strong> {{ message_count }}</p>
+    </div>
+
+    <h2>🧑‍💻 Recent Users</h2>
+    <table>
+        <tr><th>Username</th><th>Last Interaction</th></tr>
+        {% for user in recent_users %}
+            <tr><td>{{ user[0] }}</td><td>{{ user[1] }}</td></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
