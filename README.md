@@ -33,3 +33,97 @@ cd ~/onlyfans_bot
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+
+
+# 🤖 OnlyFans Bot Automation
+
+Este proyecto automatiza completamente la gestión de una cuenta de OnlyFans, incluyendo interacciones con los suscriptores, ventas de contenido PPV personalizado, seguimiento de usuarios y respuestas generadas por inteligencia artificial.
+
+## 🚀 Funcionalidades
+
+✅ Detección de usuarios online en tiempo real  
+✅ Envío de mensajes automáticos (bienvenida, interacción, promociones)  
+✅ Conversaciones personalizadas usando ChatGPT (OpenAI API)  
+✅ Sistema inteligente de ventas de contenido PPV  
+✅ Evita contenido repetido para cada usuario  
+✅ Base de datos con historial completo y perfiles personalizados  
+✅ Panel web para visualizar respuestas exitosas y rendimiento  
+✅ Soporte para proxies
+
+---
+
+## 📁 Estructura del Proyecto
+
+onlyfans_bot/
+├── bot.py                   → Script principal que ejecuta la automatización
+├── chatgpt_api.py          → Comunicación con la API de OpenAI
+├── config.py               → Configuración (API keys, rutas, etc.)
+├── database.py             → Conexión y gestión de la base de datos
+├── onlyfans.py             → Funciones específicas de Selenium para OnlyFans
+├── ppv.py                  → Gestión y envío de contenido PPV
+├── respuestas_exitosas.py  → Almacenamiento de respuestas que funcionaron
+├── respuestas_tools.py     → Herramientas para analizar respuestas
+├── templates/
+│   └── index.html          → Panel web de visualización con Flask
+├── app.py                  → Servidor web para ver estadísticas
+├── onlyfans_bot.db         → Base de datos SQLite local
+├── onlyfans_bot_messages.csv → Mensajes organizados por categoría
+├── upload_messages.py      → Script para cargar mensajes iniciales
+└── requirements.txt        → Dependencias del proyecto
+
+---
+
+## 🧠 Tecnologías utilizadas
+
+- 🐍 Python 3.10+
+- 💬 OpenAI (ChatGPT API)
+- 🌐 Selenium
+- 📦 SQLite3
+- 🔐 Flask (para panel web)
+- 🌍 Soporte para Proxies
+
+---
+
+## 🛠️ Cómo ejecutar el proyecto
+
+1. **Clona el repositorio**
+
+```bash
+git clone https://github.com/dirkconsulting/onlyfans-bot.git
+cd onlyfans_bot
+
+2.	Activa el entorno virtual
+
+source venv/bin/activate
+
+3.	Instala las dependencias
+
+pip install -r requirements.txt
+
+4.	Lanza el bot
+
+python bot.py
+
+5. 	Inicia el panel web (opcional)
+
+python app.py
+
+📊 Acceso al panel
+
+Abre tu navegador y entra en:
+
+http://<tu_IP>:5000/
+
+Aquí puedes ver:
+	•	Respuestas exitosas
+	•	Filtros por tipo de respuesta o resultado
+	•	Análisis de rendimiento
+
+⸻
+
+✍️ Cómo añadir nuevos datos
+
+Lee el archivo README_DB_HELP.md para saber:
+	•	Cómo subir usuarios nuevos
+	•	Cómo añadir contenido PPV
+	•	Cómo actualizar información manualmente
