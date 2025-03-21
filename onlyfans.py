@@ -59,3 +59,9 @@ def send_engagement_message(driver, username):
     """Envía un mensaje de interacción única para mantener el interés del usuario."""
     message = get_random_message("Engagement Messages", username)
     send_message(driver, username, message)
+
+def get_subscribers(driver):
+    driver.get("https://onlyfans.com/my/subscribers/active")
+    time.sleep(5)
+    subscribers = driver.find_elements(By.XPATH, "//div[@class='g-user-name']")
+    return [sub.text.strip() for sub in subscribers if sub.text.strip()]

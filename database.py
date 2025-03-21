@@ -1,7 +1,10 @@
 import sqlite3
 import random
+from datetime import datetime
 from config import DB_PATH
+from onlyfans import get_subscribers
 import openai
+
 
 openai.api_key = "TU_OPENAI_API_KEY"
 
@@ -139,3 +142,17 @@ def check_purchase(username, video_id):
     conn.close()
 
     return video_id in purchased[0].split("|") if purchased and purchased[0] else False
+
+def check_new_subscribers(driver):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM users")
+    existing_users = {row[0] for row in cursor.fetchall()}
+    current_subscribers = get_subscribers(driver)
+    new_users = [user for user in current_subscribers if user not in existing_users]
+    for new_user in new_users:
+        cursor.execute("INSERT INTO users (username, subscription_date) VALUES (?, ?)", 
+                       (new_user, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    conn.commit()
+    conn.close()
+    return new_users
